@@ -406,7 +406,7 @@ public class RangeSeekBar extends View {
         invalidate();
     }
 
-    private void setThumbPos(int index, float pos) {
+    public void setThumbPos(int index, float pos) {
         thumbs.get(index).pos = pos;
         calculateThumbValue(index);
         // Tell the view we want a complete redraw
@@ -736,4 +736,9 @@ public class RangeSeekBar extends View {
     public boolean isSeeking() {
         return isSeeking;
     }
+
+    public int getThumbsSize(){
+        return  thumbs.size();
+    }
+
 }
