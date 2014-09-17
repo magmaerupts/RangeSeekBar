@@ -14,8 +14,10 @@
         <attr name="thumbs" format="integer"/>
         <attr name="thumbWidth" format="dimension"/>
         <attr name="thumbHeight" format="dimension"/>
-        
-        <attr name="track" format="reference"/>
+
+         <attr name="thumbPointer" format="reference"/>
+c
+         <attr name="track" format="reference"/>
         
         <attr name="range" format="reference"/>
     </declare-styleable>
