@@ -172,6 +172,13 @@ public class RangeSeekBar extends View {
         }
     }
 
+    public void setThumbRightExtreme(int index){
+        Log.d(TAG, "thumb extreme ss" + index + "  " + pixelRangeMax + " scale " + scaleRangeMax ) ;
+        setThumbPos(index,pixelRangeMax);
+        Log.d(TAG,"thumb extreme ss thumb value : " + getThumbValue(index));
+
+    }
+
     /**
      * Draw
      *
