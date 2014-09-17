@@ -206,14 +206,15 @@ public class RangeSeekBar extends View {
         if(!thumbs.isEmpty()) {
 
 //            if thumb is not clicked, it ain't mah job to handle it -- it is to be captured by the view behind
-            Thumb clickedThumb = getThumbClicked(event);
-            if(clickedThumb==null)
-                return false;
-            Log.d(TAG,clickedThumb.getIndex() + " ");
+            if(!isSeeking) {
+                Thumb clickedThumb = getThumbClicked(event);
+                if (clickedThumb == null)
+                    return false;
+                Log.d(TAG,clickedThumb.getIndex() + " ");
+            }
 
-            boolean isExtremeThumb = false;
-            if(clickedThumb.getIndex()==0||clickedThumb.getIndex()==thumbs.size()-1)
-                isExtremeThumb = true;
+
+//            if(clickedThumb.getIndex()==0||clickedThumb.getIndex()==thumbs.size()-1)
 
 
             float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
