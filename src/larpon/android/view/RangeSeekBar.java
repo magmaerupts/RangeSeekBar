@@ -406,6 +406,10 @@ public class RangeSeekBar extends View {
         return thumbs.get(index).val;
     }
 
+    public float getThumbPos(int index) {
+        return thumbs.get(index).pos;
+    }
+
     public void setThumbValue(int index, float value) {
         thumbs.get(index).val = value;
         calculateThumbPos(index);
