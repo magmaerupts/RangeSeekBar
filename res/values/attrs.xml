@@ -14,9 +14,12 @@
         <attr name="thumbs" format="integer"/>
         <attr name="thumbWidth" format="dimension"/>
         <attr name="thumbHeight" format="dimension"/>
+        <attr name="pointHandleWidth" format="dimension"/>
+        <attr name="thumbHandleWidth" format="dimension"/>
 
          <attr name="thumbPointer" format="reference"/>
-c
+         <attr name="point" format="reference"/>
+
          <attr name="track" format="reference"/>
         
         <attr name="range" format="reference"/>
