@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -22,7 +23,7 @@ public class RangeSeekBar extends View {
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
 
-    private static final int DEFAULT_THUMBS = 2;
+    private static final int DEFAULT_THUMBS = 3;
     private static final int DEFAULT_THUMB_WIDTH = 50;
     private static final int DEFAULT_THUMB_HEIGHT = 50;
     private static final float DEFAULT_STEP = 5.0f;
@@ -33,6 +34,11 @@ public class RangeSeekBar extends View {
     private float thumbWidth;
     private float thumbHeight;
     private float thumbHalf;
+
+    private float pointHandleWidth;
+    private float thumbHandleHeight;
+    private float thumbHandleWidth;
+
     private float pixelRangeMin;
     private float pixelRangeMax;
     private int orientation;
@@ -74,8 +80,8 @@ public class RangeSeekBar extends View {
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
 
-        thumb = getResources().getDrawable(R.drawable.thumb);
-        thumbPointer = getResources().getDrawable(R.drawable.thumb);
+        thumb = getResources().getDrawable(R.drawable.trim_handle);
+        thumbPointer = getResources().getDrawable(R.drawable.playback_handle);
 
         if(!isTransparentProgressBar) {
             this.setBackgroundDrawable(getResources().getDrawable(R.drawable.rangeseekbar));
@@ -124,18 +130,18 @@ public class RangeSeekBar extends View {
         if(aThumb != null)
             thumb = aThumb;
 
+        Drawable point = a.getDrawable(R.styleable.RangeSeekBar_point);
+        if (point != null)
+            thumbPointer = point;
+
         try {
-            Drawable pointerThumb = a.getDrawable(R.styleable.RangeSeekBar_thumbPointer);
-            if (pointerThumb != null)
-                thumbPointer = pointerThumb;
-        }
-        catch(Resources.NotFoundException e){
+            Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_range);
+            if (aRange != null)
+                range = aRange;
+        }catch (Resources.NotFoundException e){
             Log.d(TAG,"aint no resources here" + e.getMessage());
         }
 
-        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_range);
-        if(aRange != null)
-            range = aRange;
 
         try {
             Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_track);
@@ -150,6 +156,13 @@ public class RangeSeekBar extends View {
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
         thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
         thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
+
+        thumbHandleHeight = 24;
+        thumbHandleWidth = a.getDimension(R.styleable.RangeSeekBar_thumbHandleWidth, 36);
+        pointHandleWidth = a.getDimension(R.styleable.RangeSeekBar_pointHandleWidth,36);
+        Log.d(TAG, "thum" + thumbHandleHeight + " " + pointHandleWidth);
+
+
 
         initThumbs(noThumbs);
 
@@ -198,9 +211,10 @@ public class RangeSeekBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);	// 1. Make sure parent view get to draw it's components
         if(!isTransparentProgressBar) {
-            drawGutter(canvas);        // 2. Draw slider gutter
-            drawRange(canvas);        // 3. Draw range in gutter
+//            drawGutter(canvas);        // 2. Draw slider gutter
+//            drawRange(canvas);        // 3. Draw range in gutter
         }
+        drawDiscardedRange(canvas);
         drawThumbs(canvas);		// 4. Draw thumbs
 
     }
@@ -208,6 +222,7 @@ public class RangeSeekBar extends View {
     private int currentThumb = 0;
     private float lowLimit = pixelRangeMin;
     private float highLimit = pixelRangeMax;
+
     /**
      *  {@inheritDoc}
      */
@@ -222,10 +237,7 @@ public class RangeSeekBar extends View {
                     return false;
                 Log.d(TAG,clickedThumb.getIndex() + " ");
             }
-
-
 //            if(clickedThumb.getIndex()==0||clickedThumb.getIndex()==thumbs.size()-1)
-
 
             float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
             int action = event.getAction();
@@ -466,6 +478,31 @@ public class RangeSeekBar extends View {
             track.draw(canvas);
         }
     }
+
+
+    private void drawDiscardedRange(Canvas canvas){
+        Thumb thLow = thumbs.get(0);
+        Thumb thHigh = thumbs.get(thumbs.size()-1);
+
+        Rect area1 = new Rect();
+        area1.left = 0;
+        area1.top = 0 + getPaddingTop() + (int) thumbHandleHeight;
+        area1.right = (int)thLow.pos;
+        area1.bottom = getMeasuredHeight() - getPaddingBottom() - (int)pointHandleWidth;
+
+        Rect area2 = new Rect();
+        area2.left = (int)thHigh.pos;
+        area2.top = 0 + getPaddingTop() + (int) thumbHandleHeight;
+        area2.right = (int)pixelRangeMax;
+        area2.bottom = getMeasuredHeight() - getPaddingBottom() - (int) pointHandleWidth;
+
+        Paint paint = new Paint();
+        paint.setColor(0x60000000);
+
+        canvas.drawRect(area1,paint);
+        canvas.drawRect(area2,paint);
+
+    }
     
     /*
 	RectF area = new RectF();
@@ -499,10 +536,12 @@ public class RangeSeekBar extends View {
                     area1.right = getMeasuredWidth() - getPaddingRight();
                     area1.bottom = (int) thHigh.pos;
                 } else {
-                    area1.left = (int) thLow.pos;
+                    area1.left = 0;
                     area1.top = 0 + getPaddingTop();
-                    area1.right = (int) thHigh.pos;
-                    area1.bottom = getMeasuredHeight() - getPaddingBottom();
+                    area1.right = (int)thLow.pos;
+                    area1.bottom = 0 + getPaddingBottom();
+                    //  area1.right = (int) thHigh.pos;
+                    //area1.bottom = getMeasuredHeight() - getPaddingBottom();
                 }
                 range.setBounds(area1);
                 range.draw(canvas);
@@ -537,16 +576,17 @@ public class RangeSeekBar extends View {
                 //draw thumbs unless it is a thumbpointerindex and
                 if (thumb != null) {
                     if(i!=thumbPointerIndex ) {
+                        area1.left = (int) ((th.pos - thumbHandleWidth /2) + getPaddingLeft());
+                        area1.right = (int) ((th.pos + thumbHandleWidth /2) - getPaddingRight());
+                        area1.bottom = getMeasuredHeight() - getPaddingBottom() - (int) pointHandleWidth;
                         thumb.setBounds(area1);
                         thumb.draw(canvas);
                     }
                     else if(isPointerThumbVisible) // must draw pointer drawable
                     {
-//                        area1.left = (int) ((th.pos - thumbHalf) + getPaddingLeft());
-//                        area1.top = getMeasuredWidth() - getPaddingTop();
-//                        area1.right = (int) ((th.pos + thumbHalf) - getPaddingRight());
-//                        area1.bottom = 0 + getPaddingBottom();
-
+                        area1.left = (int) ((th.pos - pointHandleWidth/2) + getPaddingLeft());
+                        area1.right = (int) ((th.pos + pointHandleWidth/2) - getPaddingRight());
+                        area1.top = 0 + getPaddingTop() + (int) thumbHandleHeight;
                         thumbPointer.setBounds(area1);
                         thumbPointer.draw(canvas);
                     }
