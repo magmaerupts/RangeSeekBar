@@ -313,7 +313,7 @@ public class RangeSeekBar extends View {
         if(!thumbs.isEmpty())
         {
             for(Thumb t : thumbs){
-                if(t.getBounds().contains((int) event.getX(), (int) event.getY())) {
+                if(t.handleBounds.contains((int) event.getX(), (int) event.getY())) {
                     Log.d(TAG, "This is my event " + t.val + " " + t.pos);
                     return t;
                 }
@@ -571,8 +571,7 @@ public class RangeSeekBar extends View {
                     area1.bottom = getMeasuredHeight() - getPaddingBottom();
                     //Log.d(TAG,"th: "+area1.toString());
                 }
-                th.setBounds(area1);
-                th.setIndex(i);
+
                 //draw thumbs unless it is a thumbpointerindex and
                 if (thumb != null) {
                     if(i!=thumbPointerIndex ) {
@@ -581,6 +580,7 @@ public class RangeSeekBar extends View {
                         area1.bottom = getMeasuredHeight() - getPaddingBottom() - (int) pointHandleWidth;
                         thumb.setBounds(area1);
                         thumb.draw(canvas);
+                        th.handleBounds = new Rect(area1.left,area1.top,area1.right,(int)thumbHandleWidth);
                     }
                     else if(isPointerThumbVisible) // must draw pointer drawable
                     {
@@ -589,7 +589,10 @@ public class RangeSeekBar extends View {
                         area1.top = 0 + getPaddingTop() + (int) thumbHandleHeight;
                         thumbPointer.setBounds(area1);
                         thumbPointer.draw(canvas);
+                        th.handleBounds = new Rect(area1.left,(int)pointHandleWidth,area1.right,area1.bottom);
                     }
+                    th.setBounds(area1);
+                    th.setIndex(i);
                 }
             }
         }
@@ -674,6 +677,7 @@ public class RangeSeekBar extends View {
         public float val;
         public float pos;
         private Rect bounds;
+        public Rect handleBounds;
         private Integer index;
 
         public Thumb() {
