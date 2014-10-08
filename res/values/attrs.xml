@@ -10,7 +10,7 @@
         <attr name="scaleMax" format="float"/>
         <attr name="scaleStep" format="float"/>
         
-        <attr name="thumb" format="reference"/>
+        <attr name="thumbRef" format="reference"/>
         <attr name="thumbs" format="integer"/>
         <attr name="thumbWidth" format="dimension"/>
         <attr name="thumbHeight" format="dimension"/>
@@ -20,7 +20,7 @@
          <attr name="thumbPointer" format="reference"/>
          <attr name="point" format="reference"/>
 
-         <attr name="track" format="reference"/>
+         <attr name="trackRef" format="reference"/>
         
         <attr name="range" format="reference"/>
     </declare-styleable>

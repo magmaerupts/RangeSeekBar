@@ -126,7 +126,7 @@ public class RangeSeekBar extends View {
         scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_scaleMax, 100);
         scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_scaleStep, DEFAULT_STEP));
 
-        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_thumb);
+        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_thumbRef);
         if(aThumb != null)
             thumb = aThumb;
 
@@ -144,7 +144,7 @@ public class RangeSeekBar extends View {
 
 
         try {
-            Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_track);
+            Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_trackRef);
             if (aTrack != null)
                 track = aTrack;
         }catch (Resources.NotFoundException e){
@@ -199,7 +199,6 @@ public class RangeSeekBar extends View {
         Log.d(TAG, "thumb extreme ss" + index + "  " + pixelRangeMax + " scale " + scaleRangeMax ) ;
         setThumbPos(index,pixelRangeMax);
         Log.d(TAG,"thumb extreme ss thumb value : " + getThumbValue(index));
-
     }
 
     /**
@@ -233,6 +232,10 @@ public class RangeSeekBar extends View {
 //            if thumb is not clicked, it ain't mah job to handle it -- it is to be captured by the view behind
             if(!isSeeking) {
                 Thumb clickedThumb = getThumbClicked(event);
+                if(getSeekBarClicked(event)!=null) {
+                    listener.onSeekBarTouch(this);
+                }
+
                 if (clickedThumb == null)
                     return false;
                 Log.d(TAG,clickedThumb.getIndex() + " ");
@@ -314,6 +317,24 @@ public class RangeSeekBar extends View {
         {
             for(Thumb t : thumbs){
                 if(t.handleBounds.contains((int) event.getX(), (int) event.getY())) {
+                    Log.d(TAG, "This is my event " + t.val + " " + t.pos);
+                    return t;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Thumb getSeekBarClicked(MotionEvent event) {
+//        Rect rect = new Rect(thumbs.get(0).getBounds().left,thumbs.get(0).getBounds().top,thumbs.get(2).getBounds().right),thumbs.get(1).getBounds().bottom);
+
+        Rect rect = new Rect(thumbs.get(0).getBounds().right,thumbs.get(0).getBounds().top,thumbs.get(2).getBounds().left,thumbs.get(2).getBounds().bottom);
+
+        if(!thumbs.isEmpty())
+        {
+            for(Thumb t : thumbs){
+                if(rect.contains((int) event.getX(), (int) event.getY())) {
                     Log.d(TAG, "This is my event " + t.val + " " + t.pos);
                     return t;
                 }
@@ -708,6 +729,7 @@ public class RangeSeekBar extends View {
         public void onSeek(RangeSeekBar rangeSeekBar, int index, float value);
         public void onSeekStart(RangeSeekBar rangeSeekBar, int index, float value);
         public void onSeekStop(RangeSeekBar rangeSeekBar, int index, float value);
+        public void onSeekBarTouch(RangeSeekBar rangeSeekBar);
     }
 
     public void setListener(RangeSeekBarListener listener) {
